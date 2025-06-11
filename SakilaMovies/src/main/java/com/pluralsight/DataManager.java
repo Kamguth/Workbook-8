@@ -24,8 +24,8 @@ public class DataManager {
         try (Connection conn = dataSource.getConnection();
              PreparedStatement stmt = conn.prepareStatement(query)) {
             String pattern = "%" + name + "%";
-            stmt.setString(1, pattern);
-            stmt.setString(2, pattern);
+            stmt.setString(1, pattern); //%firstname%
+            stmt.setString(2, pattern); //%lastname%
 
             try (ResultSet rs = stmt.executeQuery()) {
                 while (rs.next()) {
