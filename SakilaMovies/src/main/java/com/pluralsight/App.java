@@ -10,46 +10,48 @@ public class App {
         String user = System.getenv("DB_USER");
         String password = System.getenv("DB_PASS");
 
-        if (url == null) {
-            url = "jdbc:mysql://127.0.0.1:3306/sakila";
-        }
-        if (user == null || password == null) {
-            System.err.println("Please set DB_USER and DB_PASS environment variables.");
-            return;
-        }
+        if (url == null) url = "jdbc:mysql://127.0.0.1:3306/sakila";
+        if (user == null) user = "root";
+        if (password == null) password = "kamyg1717";
 
         DataManager dataManager = new DataManager(url, user, password);
 
         try {
-            ActorDAO actorDAO = new ActorDAO(dataManager);
             Scanner scanner = new Scanner(System.in);
 
-            System.out.print("Enter an actor's last name: ");
-            String lastName = scanner.nextLine().trim();
-            List<Actor> actors = actorDAO.getActorsByLastName(lastName);
+            // Step 1: Search actor by name
+            System.out.print("Enter a name to search for actors: ");
+            String searchName = scanner.nextLine();
 
-            if (!actors.isEmpty()) {
-                System.out.println("\nMatching actors:");
-                actors.forEach(System.out::println);
+            List<Actor> actors = dataManager.searchActorsByName(searchName);
+            if (actors.isEmpty()) {
+                System.out.println("No actors found.");
+                return;
             }
 
-            System.out.print("\nEnter the actor's FIRST name: ");
-            String firstName = scanner.nextLine().trim();
-            System.out.print("Enter the actor's LAST name: ");
-            lastName = scanner.nextLine().trim();
-
-            List<Film> films = actorDAO.getFilmsByActorName(firstName, lastName);
-
-            if (!films.isEmpty()) {
-                System.out.println("\nMovies starring " + firstName + " " + lastName + ":");
-                films.forEach(System.out::println);
+            System.out.println("\nActors Found:");
+            for (Actor actor : actors) {
+                System.out.println(actor);
             }
 
-            scanner.close();
+            // Step 2: Pick actor by ID
+            System.out.print("\nEnter an actor ID to view their films: ");
+            int actorId = scanner.nextInt();
+            scanner.nextLine(); // flush newline
+
+            List<Film> films = dataManager.getFilmsByActorId(actorId);
+            if (films.isEmpty()) {
+                System.out.println("No films found for that actor.");
+            } else {
+                System.out.println("\nFilms:");
+                for (Film film : films) {
+                    System.out.println(film + "\n");
+                }
+            }
+
         } finally {
             try {
                 dataManager.close();
-                System.out.println("\nDataManager closed.");
             } catch (SQLException e) {
                 System.err.println("Error closing DataManager: " + e.getMessage());
             }

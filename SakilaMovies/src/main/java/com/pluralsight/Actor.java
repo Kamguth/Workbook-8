@@ -11,9 +11,6 @@ public class Actor {
         this.lastName = lastName;
     }
 
-    /*public int getActorId() { return actorId; }
-    public String getFirstName() { return firstName; }
-    public String getLastName() { return lastName; }*/
 
     @Override
     public String toString() {
